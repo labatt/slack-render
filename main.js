@@ -88,5 +88,5 @@ function writeTemplate(filename, content) {
     fs.writeFileSync(filename, wrappedBody);
 }
 
-const data = json2html('direct_messages/julmrose.json');
-writeTemplate("output/julia.html", data)
+const data = json2html('direct_messages/test.json');
+writeTemplate("output/test.html", data)

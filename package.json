@@ -1,0 +1,16 @@
+{
+  "name": "slack-reader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "convert": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "markdown-it": "^8.4.2",
+    "markdown-it-emoji": "^1.4.0"
+  }
+}
