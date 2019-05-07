@@ -1,4 +1,5 @@
 var fs = require('fs');
+var process = require('process');
 var MarkdownIt = require('markdown-it');
 var emoji = require('markdown-it-emoji');
 markdown = new MarkdownIt();
@@ -90,18 +91,20 @@ function writeTemplate(filename, content) {
 }
 
 function copyStatic() {
+  fs.mkdirSync("output/static/", {"recursive": true});
   for(var fn of fs.readdirSync("static")) {
     fs.copyFileSync(`static/${fn}`, `output/static/${fn}`);
   }
 }
 
-function main(dirname) {
-  fs.mkdirSync("output/static/", {"recursive": true});
+function main() {
   copyStatic();
-  for(var channel of fs.readdirSync(`${dirname}/channels`)) {
-    var html = json2html(`${dirname}/channels/${channel}`);
+  const dirname = process.argv[2];
+
+  for(var channel of fs.readdirSync(`${dirname}/`)) {
+    var html = json2html(`${dirname}/${channel}`);
     writeTemplate(`output/${channel.replace("json", "html")}`, html);
   }
 }
 
-main(".");
+main();

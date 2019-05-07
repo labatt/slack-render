@@ -3,4 +3,4 @@ slack-render
 
 Render files created by https://github.com/alexwlchan/backup-slack as static HTML.
 
-```npm run convert```
+```npm run convert backup-dir/channels```
