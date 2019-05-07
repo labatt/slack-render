@@ -89,7 +89,15 @@ function writeTemplate(filename, content) {
     fs.writeFileSync(filename, wrappedBody);
 }
 
+function copyStatic() {
+  for(var fn of fs.readdirSync("static")) {
+    fs.copyFileSync(`static/${fn}`, `output/static/${fn}`);
+  }
+}
+
 function main(dirname) {
+  fs.mkdirSync("output/static/", {"recursive": true});
+  copyStatic();
   for(var channel of fs.readdirSync(`${dirname}/channels`)) {
     var html = json2html(`${dirname}/channels/${channel}`);
     writeTemplate(`output/${channel.replace("json", "html")}`, html);
