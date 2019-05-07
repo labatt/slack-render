@@ -1,4 +1,8 @@
 var fs = require('fs');
+var MarkdownIt = require('markdown-it');
+var emoji = require('markdown-it-emoji');
+markdown = new MarkdownIt();
+markdown.use(emoji);
 
 function msg2html(msg) {
   return `
@@ -6,9 +10,9 @@ function msg2html(msg) {
   <div class="media-content">
     <div class="content">
       <p>
-        <strong>${msg.username}</strong> <small>${msg.date}</small>
+        <strong>${msg.username}</strong> <small>${msg.time}</small>
         <br>
-        ${msg.text.join("<br><br>")}
+        ${msg.text.join("\n")}
       </p>
     </div>
   </div>
@@ -32,21 +36,23 @@ function json2html(filename) {
   var last_day = null;
 
   for(var msg of obj.messages.sort((a, b) => a.date.localeCompare(b.date))) {
-    var day = msg.date.split(' ')[0];
+    var [day, time] = msg.date.split(' ');
     var mbd = messages_by_day[day];
 
     if (mbd === undefined) {
       mbd = messages_by_day[day] = [];
     }
 
+    var rendered = markdown.render(msg.text);
+
     if (last_user !== msg.username || last_day !== day) {
       mbd.push({
-        "date": msg.date,
-        "text": [msg.text],
+        "time": time,
+        "text": [rendered],
         "username": msg.username,
       });
     } else {
-      mbd[mbd.length - 1].text.push(msg.text);
+      mbd[mbd.length - 1].text.push(rendered);
     }
 
     last_user = msg.username;
