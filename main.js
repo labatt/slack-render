@@ -1,7 +1,7 @@
-var fs = require('fs');
-var process = require('process');
-var MarkdownIt = require('markdown-it');
-var emoji = require('markdown-it-emoji');
+var fs = require("fs");
+var process = require("process");
+var MarkdownIt = require("markdown-it");
+var emoji = require("markdown-it-emoji");
 markdown = new MarkdownIt();
 markdown.use(emoji);
 
@@ -30,14 +30,14 @@ function day2html(day, messages) {
 }
 
 function json2html(filename) {
-  var file = fs.readFileSync(filename, 'utf8');
+  var file = fs.readFileSync(filename, "utf8");
   var obj = JSON.parse(file);
   var messages_by_day = {};
   var last_user = null;
   var last_day = null;
 
-  for(var msg of obj.messages.sort((a, b) => a.date.localeCompare(b.date))) {
-    var [day, time] = msg.date.split(' ');
+  for (var msg of obj.messages.sort((a, b) => a.date.localeCompare(b.date))) {
+    var [day, time] = msg.date.split(" ");
     var mbd = messages_by_day[day];
 
     if (mbd === undefined) {
@@ -48,9 +48,9 @@ function json2html(filename) {
 
     if (last_user !== msg.username || last_day !== day) {
       mbd.push({
-        "time": time,
-        "text": [rendered],
-        "username": msg.username,
+        time: time,
+        text: [rendered],
+        username: msg.username
       });
     } else {
       mbd[mbd.length - 1].text.push(rendered);
@@ -87,12 +87,12 @@ function writeTemplate(filename, content) {
   ${content}
   </body>
   </html>`;
-    fs.writeFileSync(filename, wrappedBody);
+  fs.writeFileSync(filename, wrappedBody);
 }
 
 function copyStatic() {
-  fs.mkdirSync("output/static/", {"recursive": true});
-  for(var fn of fs.readdirSync("static")) {
+  fs.mkdirSync("output/static/", { recursive: true });
+  for (var fn of fs.readdirSync("static")) {
     fs.copyFileSync(`static/${fn}`, `output/static/${fn}`);
   }
 }
@@ -101,7 +101,7 @@ function main() {
   copyStatic();
   const dirname = process.argv[2];
 
-  for(var channel of fs.readdirSync(`${dirname}/`)) {
+  for (var channel of fs.readdirSync(`${dirname}/`)) {
     var html = json2html(`${dirname}/${channel}`);
     writeTemplate(`output/${channel.replace("json", "html")}`, html);
   }
