@@ -3,17 +3,12 @@ var fs = require('fs');
 function msg2html(msg) {
   return `
 <article class="media">
-  <figure class="media-left">
-    <p class="image is-64x64">
-      <img src="https://bulma.io/images/placeholders/128x128.png">
-    </p>
-  </figure>
   <div class="media-content">
     <div class="content">
       <p>
         <strong>${msg.username}</strong> <small>${msg.date}</small>
         <br>
-        ${msg.text}
+        ${msg.text.join("<br><br>")}
       </p>
     </div>
   </div>
@@ -22,7 +17,8 @@ function msg2html(msg) {
 
 function day2html(day, messages) {
   const all_messages = messages.map(msg2html).join("\n");
-  return `<h3>${day}</h3>
+
+  return `<h3 class="title is-3">${day}</h3>
     <div>
     ${all_messages}
     </div>`;
@@ -32,32 +28,43 @@ function json2html(filename) {
   var file = fs.readFileSync(filename, 'utf8');
   var obj = JSON.parse(file);
   var messages_by_day = {};
+  var last_user = null;
+  var last_day = null;
 
-  for(var msg of obj.messages) {
+  for(var msg of obj.messages.sort((a, b) => a.date.localeCompare(b.date))) {
     var day = msg.date.split(' ')[0];
-    if (messages_by_day[day] === undefined) {
-      messages_by_day[day] = [];
+    var mbd = messages_by_day[day];
+
+    if (mbd === undefined) {
+      mbd = messages_by_day[day] = [];
     }
 
-    messages_by_day[day].push({
-      "date": msg.date,
-      "text": msg.text,
-      "username": msg.username,
-    });
+    if (last_user !== msg.username || last_day !== day) {
+      mbd.push({
+        "date": msg.date,
+        "text": [msg.text],
+        "username": msg.username,
+      });
+    } else {
+      mbd[mbd.length - 1].text.push(msg.text);
+    }
+
+    last_user = msg.username;
+    last_day = day;
   }
 
-  // for (const [key, value] of Object.entries(obj)) {
-  //   console.log(
-  // }
+  var dayChunks = [];
+  for (const [day, messages] of Object.entries(messages_by_day).sort()) {
+    dayChunks.push(day2html(day, messages));
+  }
 
-  const xday = "2019-03-27";
-  var dayhtml = day2html(xday, messages_by_day[xday]);
-
-  return dayhtml;
-
-  // var context = {
-  //   "messages_by_day": messages_by_day,
-  // };
+  return `
+  <section class="section">
+  <div class="container">
+    ${dayChunks.join("\n")}
+  </div>
+  </section>
+  `;
 }
 
 function writeTemplate(filename, content) {
@@ -66,7 +73,7 @@ function writeTemplate(filename, content) {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/static/css/bulma.45a491b38359.css">
+    <link rel="stylesheet" href="/static/bulma.min.css">
   </head>
   <body>
   ${content}
