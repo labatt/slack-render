@@ -74,6 +74,7 @@ function json2html(filename) {
 }
 
 function writeTemplate(filename, content) {
+  // console.log(filename);
   const wrappedBody = `
   <html>
   <head>
@@ -88,5 +89,11 @@ function writeTemplate(filename, content) {
     fs.writeFileSync(filename, wrappedBody);
 }
 
-const data = json2html('direct_messages/test.json');
-writeTemplate("output/test.html", data)
+function main(dirname) {
+  for(var channel of fs.readdirSync(`${dirname}/channels`)) {
+    var html = json2html(`${dirname}/channels/${channel}`);
+    writeTemplate(`output/${channel.replace("json", "html")}`, html);
+  }
+}
+
+main(".");
